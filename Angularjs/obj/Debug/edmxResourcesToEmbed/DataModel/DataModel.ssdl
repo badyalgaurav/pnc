@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="WebApiPracticeModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="WebApiPracticeModelStoreContainer">
+    <EntitySet Name="EmployeeDetails" EntityType="WebApiPracticeModel.Store.EmployeeDetails" store:Type="Tables" Schema="dbo" />
+  </EntityContainer>
+  <EntityType Name="EmployeeDetails">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="varchar" MaxLength="255" />
+    <Property Name="Age" Type="varchar" MaxLength="255" />
+    <Property Name="City" Type="varchar" MaxLength="255" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="Email" Type="varchar" MaxLength="100" />
+  </EntityType>
+</Schema>

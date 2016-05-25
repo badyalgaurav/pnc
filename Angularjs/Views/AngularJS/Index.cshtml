@@ -1,0 +1,298 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+<link href="~/Content/styles/spinner.css" rel="stylesheet" />
+<link href="~/Content/custom.css" rel="stylesheet" />
+<link href="~/app/angular-chart.min.css" rel="stylesheet" />
+<div ng-app="myApp">
+    <div ng-controller="Crud">
+        <a href="/permission">Permission</a><br />
+        <table>
+            <tr ng-repeat="items in Item">
+                <td>{{items.Name}}</td>
+                <td>{{items.RollNumber}}</td>
+                <td>{{items.Trade}}</td>
+                <td><a ng-click="Edit(items.Id);">Edit</a></td>
+                <td>
+                    <input type="button" ng-click="Update(items.Id);" value="Update" /></td>
+                <td><a ng-click="Delete(items.Id);">Delete</a>
+
+                </td>
+            </tr>
+
+        </table>
+        <div>
+            <spinner></spinner>
+        </div>
+        <table>
+            <tr>
+                <td>Name: </td>
+                <td>
+                    <input type="text" ng-model="Name" value="{{EditItem.Name}}" /></td>
+            </tr>
+            <tr>
+                <td>Roll Number</td>
+                <td>
+                    <input type="text" ng-model="RollNumber" value="{{EditItem.RollNumber}}" /></td>
+            </tr>
+            <tr>
+                <td>Trade</td>
+                <td>
+                    <input type="text" ng-model="Trade" value="{{EditItem.Trade}}" /></td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" ng-click="display();" value="Display Records" />
+                    <input type="button" ng-click="Save();" value="Save" />
+                    <input type="button" ng-click="Loader();" value="Loader" />
+                    <input type="button" ng-click="NewPage();" value="NewPage" />
+
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td>
+                    <input type="text" value="{{EditItem.Name}}" />
+                </td>
+                <td>
+                    <input type="text" value="{{EditItem.RollNumber}}" /></td>
+                <td>
+                    <input type="text" value="{{EditItem.Trade}}" /></td>
+
+            </tr>
+            <tr>
+                @*<td><input type="button" ng-click="Update();" value="Update"/></td>*@
+            </tr>
+        </table>
+        <canvas id="bar" class="chart chart-bar"  chart-data="data" chart-labels="labels" chart-series="series"></canvas>
+
+
+        <div google-chart chart="myChartObject" style="height:600px; width:100%;"></div>
+    </div>
+
+    <div ng-controller="Part8Controller">
+        <form novalidate name="f1" ng-submit="SaveFile()">
+            <div style="color: red">{{Message}}</div>
+            <table>
+                <tr>
+                    <td>Select File : </td>
+                    <td>
+                        <input type="file" name="file" accept="image/*" onchange="angular.element(this).scope().selectFileforUpload(this.files)" required />
+                        <span class="error" ng-show="(f1.file.$dirty || IsFormSubmitted) && f1.file.$error.required">Image required!</span>
+                        <span class="error">{{FileInvalidMessage}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Description : </td>
+                    <td>
+                        <input type="text" name="uFileDescription" ng-model="FileDescription" class="{{(IsFormSubmitted?'ng-dirty' + (f1.uFileDescription.$invalid?' ng-invalid':''):'')}}" autofocus />
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="submit" value="Upload File" />
+                    </td>
+                </tr>
+            </table>
+
+        </form>
+    </div>
+</div>
+<script type="application/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+
+@*working*@
+<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.min.js"></script>
+<script src="~/Content/scripts/spinner.js"></script>
+<!-- minified for production -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-chart/0.1.0/ng-google-chart.min.js" type="text/javascript"></script>
+<script src="http://cdn.rawgit.com/nnnick/Chart.js/master/Chart.min.js" type="text/javascript"></script>
+<script src="~/app/angular-chart.min.js"></script>
+<script>
+   var collection = [];
+    //AngularJS controller
+   var app = angular.module("myApp", ['ngSpinner', 'chart.js', 'googlechart']).config(
+ function ($httpProvider, ChartJsProvider) {
+        ChartJsProvider.setOptions({ colours: ['#803690', '#00ADF9', '#DCDCDC', '#46BFBD', '#FDB45C', '#949FB1', '#4D5360'] });
+        //Enable cross domain calls
+        $httpProvider.defaults.useXDomain = true;
+
+        //Remove the header used to identify ajax call  that would prevent CORS from working
+        delete $httpProvider.defaults.headers.common['X-Requested-With'];
+    })
+    .controller('Crud', function ($scope, $http) {
+        $scope.labels = ['2006', '2007', '2008', '2009', '2010', '2011','2012','2013','2014','2015','2016'];
+        $scope.series = ['Series A', 'Series B'];
+        var test = $http({
+            method: 'GET',
+            url: "AngularJS/AngularJsButtonLoader",
+            headers: { 'Content-Type': 'application/JSON' }
+        }).success(function (response) {
+            debugger
+            angular.forEach(response, function (item) {
+                debugger;
+                collection.push(item);
+            });
+
+            //collection = response;
+            //var coll = "[" + collection + "]";
+            //alert(coll);
+            //debugger;
+        });
+      
+        $scope.data =[collection] ;
+
+
+        $scope.Save = function () {
+            debugger;
+            // $scope.loading = true;
+            var json = {
+                Name: $scope.Name,
+                RollNumber: $scope.RollNumber,
+                Trade: $scope.Trade
+            }
+            debugger;
+            var stri = JSON.stringify(json)
+            debugger;
+            $http({
+                method: 'POST',
+                url: "AngularJS/Save",
+                data: JSON.stringify({ stri: stri }),
+                headers: { 'Content-Type': 'application/JSON' }
+            })
+
+            //$http.post("AngularJS/Save",stri)
+            .success(function (response) {
+                //$scope.loading = false;
+                alert("Successfully Saved....!!!!");
+            })
+
+        };
+        $scope.myChartObject = {};
+
+        $scope.myChartObject.type = "BarChart";
+
+        $scope.onions = [
+            { v: "Onions" },
+            { v: 3 },
+        ];
+
+        $scope.myChartObject.data = {
+            "cols": [
+                { id: "t", label: "Topping", type: "string" },
+                { id: "s", label: "Slices", type: "number" }
+            ], "rows": [
+                {
+                    c: [
+                       { v: "Mushrooms" },
+                       { v: 5},
+                    ]
+                },
+                { c: $scope.onions },
+                {
+                    c: [
+                       { v: "Olives" },
+                       { v: 31 }
+                    ]
+                },
+                {
+                    c: [
+                       { v: "Zucchini" },
+                       { v: 1 },
+                    ]
+                },
+                {
+                    c: [
+                       { v: "Pepperoni" },
+                       { v: 2 },
+                    ]
+                }
+            ]
+        };
+
+        $scope.myChartObject.options = {
+            'title': 'How Much Pizza I Ate Last Night'
+        };
+
+    });
+
+    //function Crud($scope, $http) {
+
+    //$http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+
+    //$scope.display = function () {
+
+    //    $http.get("AngularJS/Display")
+    //    .success(function (response) { $scope.Item = response; })
+    //};
+    //$scope.Save = function () {
+    //    debugger;
+    //    $scope.loading = true;
+    //    var json = {
+    //        Name: $scope.Name,
+    //        RollNumber: $scope.RollNumber,
+    //        Trade: $scope.Trade
+    //    }
+    //    debugger;
+    //    var stri = JSON.stringify(json)
+    //    debugger;
+    //    $http({
+    //        method: 'POST',
+    //        url:"AngularJS/Save" ,
+    //        data: JSON.stringify({ stri: stri }),
+    //        headers: { 'Content-Type': 'application/JSON' }
+    //    })
+
+    //    //$http.post("AngularJS/Save",stri)
+    //    .success(function (response) {
+    //        $scope.loading = false;
+    //        alert("Successfully Saved....!!!!");
+    //    })
+
+    //};
+    //debugger;
+    //$scope.Edit = function (Id) {
+    //    debugger;
+    //    var str = JSON.stringify(Id);
+    //    $http({
+    //        method: 'POST',
+    //        url: "AngularJS/Edit",
+    //        data: JSON.stringify({ str: str }),
+    //        headers: { 'Content-Type': 'application/JSON' }
+    //    })
+    //    .success(function (data) { $scope.EditItem = data; })
+
+    //};
+    //$scope.Delete = function (Id) {
+    //    var str = JSON.stringify(Id);
+    //    $http({
+    //        method: 'POST',
+    //        url: "AngularJS/Delete",
+    //        data: JSON.stringify({ str: str }),
+    //        headers: { 'Content-Type': 'application/JSON' }
+    //    })
+    //    .success(function (data) {
+    //        alert("successfully Deleted");
+    //    })
+
+    //};
+    //$scope.Update = function (Id) {
+    //    var json = {
+    //        Name: $scope.Name,
+    //        RollNumber: $scope.RollNumber,
+    //        Trade: $scope.Trade
+    //    }
+    //    var data = JSON.stringify(json);
+    //    var str = JSON.stringify(Id);
+    //    $http({ method: 'POST',
+    //        url: "AngularJS/Update",
+    //        data: JSON.stringify({ str: str , data:data}),
+    //        headers: { 'Content-Type': 'application/JSON' }
+    //    })
+    //}
+    //}
+</script>
+<script src="~/app/Part8Controller.js"></script>
